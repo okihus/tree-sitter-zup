@@ -61,6 +61,14 @@ Other Neovim setups can use nvim-treesitter's custom parser mechanism with
 this repo's URL; the `queries/zup → .` symlink makes the repo double as a
 query runtimepath entry.
 
+## VS Code
+
+VS Code can't consume tree-sitter grammars directly; `vscode/` contains an
+extension that compiles both grammars to WASM and serves the highlight-query
+captures through VS Code's semantic tokens API, including the zup injection
+into `.zupt` `--FILE--` bodies. See [vscode/README.md](vscode/README.md) for
+build and install instructions.
+
 ## Development
 
 The dev shell is a [devenv](https://devenv.sh) environment (`direnv allow`

@@ -1,0 +1,94 @@
+{
+  "name": "zup-language",
+  "displayName": "Zup",
+  "description": "Zup language support: tree-sitter-based highlighting for .zup and .zupt files",
+  "version": "0.1.0",
+  "publisher": "okihus",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/okihus/tree-sitter-zup",
+    "directory": "vscode"
+  },
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "main": "./extension.js",
+  "activationEvents": [
+    "onLanguage:zup",
+    "onLanguage:zupt"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "zup",
+        "aliases": [
+          "Zup"
+        ],
+        "extensions": [
+          ".zup"
+        ],
+        "configuration": "./language-configuration-zup.json"
+      },
+      {
+        "id": "zupt",
+        "aliases": [
+          "Zup test"
+        ],
+        "extensions": [
+          ".zupt"
+        ]
+      }
+    ],
+    "semanticTokenTypes": [
+      {
+        "id": "boolean",
+        "superType": "keyword",
+        "description": "Boolean literal"
+      },
+      {
+        "id": "constantBuiltin",
+        "superType": "keyword",
+        "description": "Built-in constant such as null"
+      },
+      {
+        "id": "escapeSequence",
+        "superType": "string",
+        "description": "Escape sequence inside a string or char literal"
+      },
+      {
+        "id": "directive",
+        "superType": "keyword",
+        "description": "Zupt --SECTION-- header"
+      }
+    ],
+    "semanticTokenScopes": [
+      {
+        "scopes": {
+          "boolean": [
+            "constant.language.boolean"
+          ],
+          "constantBuiltin": [
+            "constant.language"
+          ],
+          "escapeSequence": [
+            "constant.character.escape"
+          ],
+          "directive": [
+            "keyword.control.directive"
+          ]
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "build-assets": "tree-sitter build --wasm --output assets/tree-sitter-zup.wasm .. && tree-sitter build --wasm --output assets/tree-sitter-zupt.wasm ../zupt && cp ../queries/highlights.scm assets/zup-highlights.scm && cp ../zupt/queries/highlights.scm assets/zupt-highlights.scm",
+    "package": "npm run build-assets && npx @vscode/vsce package"
+  },
+  "dependencies": {
+    "web-tree-sitter": "^0.26.11"
+  }
+}
