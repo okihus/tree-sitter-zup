@@ -21,6 +21,9 @@
           language = "zup";
           version = "0.1.0";
           src = self;
+          # queries/zupt points at ../zupt/queries, which isn't part of this
+          # package's output — drop the dangling symlink.
+          postInstall = "rm -f $out/queries/zupt";
         };
 
         # Grammar for zup's sectioned test files (*.zupt); the injection
