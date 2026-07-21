@@ -1,0 +1,112 @@
+==================
+basic test file
+==================
+
+--TEST--
+an if statement parses
+--FILE--
+pub fn main(): i32 {
+  return 0;
+}
+--EXPECT--
+Container (file) (1 members)
+--EXIT--
+
+---
+
+(source_file
+  (section
+    name: (section_header)
+    body: (section_body
+      (body_line)))
+  (section
+    name: (section_header)
+    body: (section_body
+      (body_line)
+      (body_line)
+      (body_line)))
+  (section
+    name: (section_header)
+    body: (section_body
+      (body_line)))
+  (section
+    name: (section_header)))
+
+==================
+args, expecterr, prepare and cleanup sections
+==================
+
+--TEST--
+flags are parsed
+--ARGS--
+--ast
+--PREPARE--
+echo 'setup' > "$TMPDIR/fixture.zup"
+--FILE--
+const std = import("std");
+--EXPECTERR--
+zup: error: expected a declaration (got TOKEN_NUMBER) [1:18]
+--CLEANUP--
+rm -f "$TMPDIR/fixture.zup"
+--EXIT--
+
+---
+
+(source_file
+  (section
+    name: (section_header)
+    body: (section_body
+      (body_line)))
+  (section
+    name: (section_header)
+    body: (section_body
+      (body_line)))
+  (section
+    name: (section_header)
+    body: (section_body
+      (body_line)))
+  (section
+    name: (section_header)
+    body: (section_body
+      (body_line)))
+  (section
+    name: (section_header)
+    body: (section_body
+      (body_line)))
+  (section
+    name: (section_header)
+    body: (section_body
+      (body_line)))
+  (section
+    name: (section_header)))
+
+==================
+body lines starting with dashes stay body lines
+==================
+
+--TEST--
+tricky bodies
+--ARGS--
+--ast
+--EXPECT--
+--EXPECT-- is not a header when followed by text
+-- lone dashes
+---
+
+---
+
+(source_file
+  (section
+    name: (section_header)
+    body: (section_body
+      (body_line)))
+  (section
+    name: (section_header)
+    body: (section_body
+      (body_line)))
+  (section
+    name: (section_header)
+    body: (section_body
+      (body_line)
+      (body_line)
+      (body_line))))

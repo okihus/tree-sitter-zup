@@ -12,6 +12,19 @@
       ],
       "highlights": "queries/highlights.scm",
       "injection-regex": "^zup$"
+    },
+    {
+      "name": "zupt",
+      "camelcase": "Zupt",
+      "title": "Zupt",
+      "scope": "source.zupt",
+      "path": "zupt",
+      "file-types": [
+        "zupt"
+      ],
+      "highlights": "zupt/queries/highlights.scm",
+      "injections": "zupt/queries/injections.scm",
+      "injection-regex": "^zupt$"
     }
   ],
   "metadata": {

@@ -18,16 +18,20 @@ jobs:
 
       - uses: cachix/install-nix-action@v31
 
-      - name: Generated parser is in sync with grammar.js
+      - name: Generated parsers are in sync with grammar.js
         run: |
           nix shell nixpkgs#tree-sitter nixpkgs#nodejs -c tree-sitter generate
-          git diff --exit-code -- src/
+          nix shell nixpkgs#tree-sitter nixpkgs#nodejs -c bash -c 'cd zupt && tree-sitter generate'
+          git diff --exit-code -- src/ zupt/src/
 
-      - name: Corpus tests
+      - name: Corpus tests (zup)
         run: nix shell nixpkgs#tree-sitter nixpkgs#nodejs nixpkgs#gcc -c tree-sitter test
 
+      - name: Corpus tests (zupt)
+        run: nix shell nixpkgs#tree-sitter nixpkgs#nodejs nixpkgs#gcc -c bash -c 'cd zupt && tree-sitter test'
+
       - name: Flake packages build
-        run: nix build .#tree-sitter-zup .#tree-sitter-zup-queries
+        run: nix build .#tree-sitter-zup .#tree-sitter-zupt .#tree-sitter-zup-queries
 
   zup-corpus:
     runs-on: ubuntu-latest
@@ -47,5 +51,12 @@ jobs:
       - name: Parse zup examples/ and std/ (fails on any ERROR node)
         run: |
           find zup-upstream/examples zup-upstream/std -name '*.zup' -print0 \
+            | xargs -0 nix shell nixpkgs#tree-sitter nixpkgs#nodejs nixpkgs#gcc -c \
+                tree-sitter parse --quiet --stat all
+
+      - name: Parse zup tests/ *.zupt files (fails on any ERROR node)
+        working-directory: zupt
+        run: |
+          find ../zup-upstream/tests -name '*.zupt' -print0 \
             | xargs -0 nix shell nixpkgs#tree-sitter nixpkgs#nodejs nixpkgs#gcc -c \
                 tree-sitter parse --quiet --stat all
