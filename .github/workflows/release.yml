@@ -1,0 +1,55 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  vsix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v31
+
+      - name: Tag matches extension version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          ver=$(jq -r .version vscode/package.json)
+          if [ "v$ver" != "$GITHUB_REF_NAME" ]; then
+            echo "tag $GITHUB_REF_NAME does not match vscode/package.json version $ver"
+            exit 1
+          fi
+
+      - name: Build wasm grammars and query assets
+        working-directory: vscode
+        run: |
+          nix shell nixpkgs#tree-sitter nixpkgs#nodejs -c bash -c \
+            'npm ci && npm run build-assets'
+
+      - name: Smoke-test the highlighter
+        working-directory: vscode
+        run: |
+          printf 'fn main(): i32 {\n  let s = "hi\\n";\n  return 0;\n}\n' > /tmp/smoke.zup
+          nix shell nixpkgs#nodejs -c node test.js /tmp/smoke.zup
+
+      - name: Package the extension
+        working-directory: vscode
+        run: nix shell nixpkgs#nodejs -c npx --yes @vscode/vsce package
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: zup-language-vsix
+          path: vscode/*.vsix
+
+      - name: Attach to GitHub release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes || true
+          gh release upload "$GITHUB_REF_NAME" vscode/*.vsix --clobber

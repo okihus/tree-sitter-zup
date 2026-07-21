@@ -16,7 +16,12 @@ instant before the semantic provider first runs.
 
 ## Build and install
 
-Requires the tree-sitter CLI and Node.js — both provided by the repo's devenv
+Prebuilt `.vsix` files are attached to the repo's
+[GitHub releases](https://github.com/okihus/tree-sitter-zup/releases)
+(published by CI on `v*` tags, where the tag must match this package's
+version): download and `code --install-extension zup-language-<version>.vsix`.
+
+To build from source instead: requires the tree-sitter CLI and Node.js — both provided by the repo's devenv
 shell. From this directory:
 
 ```sh
