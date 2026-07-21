@@ -85,7 +85,7 @@
     ]
   },
   "scripts": {
-    "build-assets": "tree-sitter build --wasm --output assets/tree-sitter-zup.wasm .. && tree-sitter build --wasm --output assets/tree-sitter-zupt.wasm ../zupt && cp ../queries/highlights.scm assets/zup-highlights.scm && cp ../zupt/queries/highlights.scm assets/zupt-highlights.scm",
+    "build-assets": "mkdir -p assets && tree-sitter build --wasm --output assets/tree-sitter-zup.wasm .. && tree-sitter build --wasm --output assets/tree-sitter-zupt.wasm ../zupt && cp ../queries/highlights.scm assets/zup-highlights.scm && cp ../zupt/queries/highlights.scm assets/zupt-highlights.scm",
     "package": "npm run build-assets && npx @vscode/vsce package"
   },
   "dependencies": {
