@@ -1,0 +1,361 @@
+==================
+return with and without value
+==================
+
+fn f() {
+  return;
+}
+
+fn g(): i32 {
+  return 42;
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (block
+      (return_statement)))
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (primitive_type)
+    (block
+      (return_statement
+        (number_literal)))))
+
+==================
+let and const with and without types
+==================
+
+fn f() {
+  let x: i32 = 5;
+  let y = 6;
+  const z: [_]i32 = [1, 2, 3];
+  const w = "hi";
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (block
+      (variable_declaration
+        (identifier)
+        (primitive_type)
+        (number_literal))
+      (variable_declaration
+        (identifier)
+        (number_literal))
+      (variable_declaration
+        (identifier)
+        (array_type
+          (primitive_type))
+        (array_literal
+          (number_literal)
+          (number_literal)
+          (number_literal)))
+      (variable_declaration
+        (identifier)
+        (string_literal)))))
+
+==================
+if / else if / else
+==================
+
+fn f(): i32 {
+  if false {
+    return 0;
+  } else if true {
+    return 1;
+  } else {
+    return 2;
+  }
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (primitive_type)
+    (block
+      (if_statement
+        (boolean_literal)
+        (block
+          (return_statement
+            (number_literal)))
+        (if_statement
+          (boolean_literal)
+          (block
+            (return_statement
+              (number_literal)))
+          (block
+            (return_statement
+              (number_literal))))))))
+
+==================
+while loop
+==================
+
+fn f() {
+  while true {
+    break;
+  }
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (block
+      (while_statement
+        (boolean_literal)
+        (block
+          (break_statement))))))
+
+==================
+for range loop
+==================
+
+fn f() {
+  for i in 0..5 {
+    continue;
+  }
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (block
+      (for_statement
+        (identifier)
+        (number_literal)
+        (number_literal)
+        (block
+          (continue_statement))))))
+
+==================
+foreach over expression and array literal
+==================
+
+fn f(items: []i32) {
+  for x in items {
+  }
+  for i in [1, 2, 3] {
+  }
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (slice_type
+          (primitive_type))))
+    (block
+      (for_statement
+        (identifier)
+        (identifier)
+        (block))
+      (for_statement
+        (identifier)
+        (array_literal
+          (number_literal)
+          (number_literal)
+          (number_literal))
+        (block)))))
+
+==================
+defer statement
+==================
+
+fn f() {
+  defer cleanup();
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (block
+      (defer_statement
+        (call_expression
+          (identifier)
+          (argument_list))))))
+
+==================
+assignments: simple, compound, coalesce
+==================
+
+fn f() {
+  x = 9;
+  p.x = 5;
+  a[0] = 1;
+  x += 1;
+  x -= 1;
+  x *= 2;
+  x /= 2;
+  x %= 2;
+  x &= 3;
+  x |= 3;
+  x ^= 3;
+  x <<= 1;
+  x >>= 1;
+  x ??= 4;
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (block
+      (assignment_statement
+        (identifier)
+        (number_literal))
+      (assignment_statement
+        (field_expression
+          (identifier)
+          (identifier))
+        (number_literal))
+      (assignment_statement
+        (index_expression
+          (identifier)
+          (number_literal))
+        (number_literal))
+      (assignment_statement
+        (identifier)
+        (number_literal))
+      (assignment_statement
+        (identifier)
+        (number_literal))
+      (assignment_statement
+        (identifier)
+        (number_literal))
+      (assignment_statement
+        (identifier)
+        (number_literal))
+      (assignment_statement
+        (identifier)
+        (number_literal))
+      (assignment_statement
+        (identifier)
+        (number_literal))
+      (assignment_statement
+        (identifier)
+        (number_literal))
+      (assignment_statement
+        (identifier)
+        (number_literal))
+      (assignment_statement
+        (identifier)
+        (number_literal))
+      (assignment_statement
+        (identifier)
+        (number_literal))
+      (assignment_statement
+        (identifier)
+        (number_literal)))))
+
+==================
+increment and decrement statements
+==================
+
+fn f() {
+  i++;
+  j--;
+  p.x++;
+  a[0]--;
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (block
+      (update_statement
+        (identifier))
+      (update_statement
+        (identifier))
+      (update_statement
+        (field_expression
+          (identifier)
+          (identifier)))
+      (update_statement
+        (index_expression
+          (identifier)
+          (number_literal))))))
+
+==================
+expression statement
+==================
+
+fn f() {
+  g(1, 2);
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (block
+      (expression_statement
+        (call_expression
+          (identifier)
+          (argument_list
+            (number_literal)
+            (number_literal)))))))
+
+==================
+match as statement without semicolon
+==================
+
+fn f(c: i32) {
+  match c {
+    1 => g(),
+    _ => {}
+  }
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (primitive_type)))
+    (block
+      (expression_statement
+        (match_expression
+          (identifier)
+          (match_arm
+            (match_pattern
+              (number_literal))
+            (call_expression
+              (identifier)
+              (argument_list)))
+          (match_arm
+            (block)))))))

@@ -1,0 +1,25 @@
+# Devenv
+.devenv*
+devenv.local.nix
+devenv.local.yaml
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml
+
+# Node
+node_modules/
+
+# Build artifacts
+build/
+target/
+*.o
+*.so
+*.dylib
+*.wasm
+dist/
+
+# tree-sitter dev artifacts
+log.html

@@ -1,0 +1,667 @@
+==================
+arithmetic precedence
+==================
+
+fn f(): i32 {
+  return 1 + 2 * 3;
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (primitive_type)
+    (block
+      (return_statement
+        (binary_expression
+          (number_literal)
+          (binary_expression
+            (number_literal)
+            (number_literal)))))))
+
+==================
+comparison and logical precedence
+==================
+
+fn f(a: bool, b: bool, c: bool): bool {
+  return a || b && c == !a;
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (primitive_type))
+      (parameter
+        (identifier)
+        (primitive_type))
+      (parameter
+        (identifier)
+        (primitive_type)))
+    (primitive_type)
+    (block
+      (return_statement
+        (binary_expression
+          (identifier)
+          (binary_expression
+            (identifier)
+            (binary_expression
+              (identifier)
+              (unary_expression
+                (identifier)))))))))
+
+==================
+bitwise and shift precedence
+==================
+
+fn f(a: i32, b: i32, c: i32): i32 {
+  return a | b & c ^ a << 2 >> 1;
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (primitive_type))
+      (parameter
+        (identifier)
+        (primitive_type))
+      (parameter
+        (identifier)
+        (primitive_type)))
+    (primitive_type)
+    (block
+      (return_statement
+        (binary_expression
+          (identifier)
+          (binary_expression
+            (binary_expression
+              (identifier)
+              (identifier))
+            (binary_expression
+              (binary_expression
+                (identifier)
+                (number_literal))
+              (number_literal))))))))
+
+==================
+parenthesized expression
+==================
+
+fn f(): i32 {
+  return (2 + 3) * 4;
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (primitive_type)
+    (block
+      (return_statement
+        (binary_expression
+          (parenthesized_expression
+            (binary_expression
+              (number_literal)
+              (number_literal)))
+          (number_literal))))))
+
+==================
+unary operators
+==================
+
+fn f(x: i32, b: bool): i32 {
+  return -x + (!b ? 0 : 1) + g(&x);
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (primitive_type))
+      (parameter
+        (identifier)
+        (primitive_type)))
+    (primitive_type)
+    (block
+      (return_statement
+        (binary_expression
+          (binary_expression
+            (unary_expression
+              (identifier))
+            (parenthesized_expression
+              (conditional_expression
+                (unary_expression
+                  (identifier))
+                (number_literal)
+                (number_literal))))
+          (call_expression
+            (identifier)
+            (argument_list
+              (unary_expression
+                (identifier)))))))))
+
+==================
+cast expression, chained
+==================
+
+fn f(x: i8): i64 {
+  return x as i32 as i64;
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (primitive_type)))
+    (primitive_type)
+    (block
+      (return_statement
+        (cast_expression
+          (cast_expression
+            (identifier)
+            (primitive_type))
+          (primitive_type))))))
+
+==================
+cast to qualified and compound types
+==================
+
+fn f(p: *void) {
+  let a = p as *std.mem.Arena;
+  let b = x as ?i32;
+  let c = y as []u8;
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (pointer_type
+          (primitive_type))))
+    (block
+      (variable_declaration
+        (identifier)
+        (cast_expression
+          (identifier)
+          (pointer_type
+            (qualified_type
+              (identifier)
+              (identifier)
+              (type_identifier)))))
+      (variable_declaration
+        (identifier)
+        (cast_expression
+          (identifier)
+          (optional_type
+            (primitive_type))))
+      (variable_declaration
+        (identifier)
+        (cast_expression
+          (identifier)
+          (slice_type
+            (primitive_type)))))))
+
+==================
+ternary expression
+==================
+
+fn f(): i32 {
+  return true ? 1 : 2;
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (primitive_type)
+    (block
+      (return_statement
+        (conditional_expression
+          (boolean_literal)
+          (number_literal)
+          (number_literal))))))
+
+==================
+coalesce and propagate
+==================
+
+fn f(x: ?i32): i32 {
+  let v = x ?? 0;
+  let w = get()?;
+  return v;
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (optional_type
+          (primitive_type))))
+    (primitive_type)
+    (block
+      (variable_declaration
+        (identifier)
+        (binary_expression
+          (identifier)
+          (number_literal)))
+      (variable_declaration
+        (identifier)
+        (propagate_expression
+          (call_expression
+            (identifier)
+            (argument_list))))
+      (return_statement
+        (identifier)))))
+
+==================
+unwrap expression
+==================
+
+fn f(x: ?i32): i32 {
+  return x! + 1;
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (optional_type
+          (primitive_type))))
+    (primitive_type)
+    (block
+      (return_statement
+        (binary_expression
+          (unwrap_expression
+            (identifier))
+          (number_literal))))))
+
+==================
+calls, methods, field chains
+==================
+
+fn f(): i32 {
+  std.io.println("hi");
+  return p.sum() + fs.getInt("n");
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (primitive_type)
+    (block
+      (expression_statement
+        (call_expression
+          (field_expression
+            (field_expression
+              (identifier)
+              (identifier))
+            (identifier))
+          (argument_list
+            (string_literal))))
+      (return_statement
+        (binary_expression
+          (call_expression
+            (field_expression
+              (identifier)
+              (identifier))
+            (argument_list))
+          (call_expression
+            (field_expression
+              (identifier)
+              (identifier))
+            (argument_list
+              (string_literal))))))))
+
+==================
+index and slice expressions
+==================
+
+fn f(a: []i32): i32 {
+  let s = a[1..3];
+  return a[0] + a[len - 1];
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (slice_type
+          (primitive_type))))
+    (primitive_type)
+    (block
+      (variable_declaration
+        (identifier)
+        (slice_expression
+          (identifier)
+          (number_literal)
+          (number_literal)))
+      (return_statement
+        (binary_expression
+          (index_expression
+            (identifier)
+            (number_literal))
+          (index_expression
+            (identifier)
+            (binary_expression
+              (identifier)
+              (number_literal))))))))
+
+==================
+struct literals: plain, qualified, nested, anonymous
+==================
+
+fn f() {
+  let p = Point { x: 1, y: 2 };
+  let l = Line { a: Point { x: 1, y: 2 }, b: p };
+  let fs = std.flag.FlagSet { count: 0 };
+  let anon = { a: 1, b: 2 };
+  let empty = Point {};
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (block
+      (variable_declaration
+        (identifier)
+        (struct_literal
+          (identifier)
+          (field_initializer
+            (identifier)
+            (number_literal))
+          (field_initializer
+            (identifier)
+            (number_literal))))
+      (variable_declaration
+        (identifier)
+        (struct_literal
+          (identifier)
+          (field_initializer
+            (identifier)
+            (struct_literal
+              (identifier)
+              (field_initializer
+                (identifier)
+                (number_literal))
+              (field_initializer
+                (identifier)
+                (number_literal))))
+          (field_initializer
+            (identifier)
+            (identifier))))
+      (variable_declaration
+        (identifier)
+        (struct_literal
+          (field_expression
+            (field_expression
+              (identifier)
+              (identifier))
+            (identifier))
+          (field_initializer
+            (identifier)
+            (number_literal))))
+      (variable_declaration
+        (identifier)
+        (struct_literal
+          (field_initializer
+            (identifier)
+            (number_literal))
+          (field_initializer
+            (identifier)
+            (number_literal))))
+      (variable_declaration
+        (identifier)
+        (struct_literal
+          (identifier))))))
+
+==================
+array literal
+==================
+
+fn f() {
+  let a: [3]i32 = [10, 20, 30];
+  let b = [];
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (block
+      (variable_declaration
+        (identifier)
+        (array_type
+          (number_literal)
+          (primitive_type))
+        (array_literal
+          (number_literal)
+          (number_literal)
+          (number_literal)))
+      (variable_declaration
+        (identifier)
+        (array_literal)))))
+
+==================
+enum literals with and without payload
+==================
+
+fn f() {
+  let c: Color = .Green;
+  let v: Value = .Int(42);
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (block
+      (variable_declaration
+        (identifier)
+        (type_identifier)
+        (enum_literal
+          (identifier)))
+      (variable_declaration
+        (identifier)
+        (type_identifier)
+        (enum_literal
+          (identifier)
+          (number_literal))))))
+
+==================
+sizeof expression
+==================
+
+fn f(): i64 {
+  return sizeof(i32) as i64 + sizeof(std.mem.Arena) as i64;
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (primitive_type)
+    (block
+      (return_statement
+        (binary_expression
+          (cast_expression
+            (sizeof_expression
+              (primitive_type))
+            (primitive_type))
+          (cast_expression
+            (sizeof_expression
+              (qualified_type
+                (identifier)
+                (identifier)
+                (type_identifier)))
+            (primitive_type)))))))
+
+==================
+number literals: hex, float, exponent
+==================
+
+fn f() {
+  let a = 255;
+  let b = 0xFF;
+  let c = 3.14;
+  let d = 1e10;
+  let e = 2.5e-3;
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (block
+      (variable_declaration
+        (identifier)
+        (number_literal))
+      (variable_declaration
+        (identifier)
+        (number_literal))
+      (variable_declaration
+        (identifier)
+        (number_literal))
+      (variable_declaration
+        (identifier)
+        (number_literal))
+      (variable_declaration
+        (identifier)
+        (number_literal)))))
+
+==================
+char literals
+==================
+
+fn f() {
+  let a = 'x';
+  let b = '\n';
+  let c = '\'';
+  let d = '\\';
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (block
+      (variable_declaration
+        (identifier)
+        (char_literal))
+      (variable_declaration
+        (identifier)
+        (char_literal))
+      (variable_declaration
+        (identifier)
+        (char_literal))
+      (variable_declaration
+        (identifier)
+        (char_literal)))))
+
+==================
+string literals with escapes
+==================
+
+fn f() {
+  let s = "hello \"world\"\n";
+  let t = "tab\there";
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (block
+      (variable_declaration
+        (identifier)
+        (string_literal
+          (escape_sequence)
+          (escape_sequence)
+          (escape_sequence)))
+      (variable_declaration
+        (identifier)
+        (string_literal
+          (escape_sequence))))))
+
+==================
+boolean and null literals
+==================
+
+fn f() {
+  let a = true;
+  let b = false;
+  let c = null;
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (block
+      (variable_declaration
+        (identifier)
+        (boolean_literal))
+      (variable_declaration
+        (identifier)
+        (boolean_literal))
+      (variable_declaration
+        (identifier)
+        (null_literal)))))

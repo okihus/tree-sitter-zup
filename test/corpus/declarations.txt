@@ -1,0 +1,346 @@
+==================
+function declaration
+==================
+
+fn inc(x: i32): i32 {
+  return x;
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (primitive_type)))
+    (primitive_type)
+    (block
+      (return_statement
+        (identifier)))))
+
+==================
+public function without return type
+==================
+
+pub fn log(msg: str) {
+}
+
+---
+
+(source_file
+  (function_declaration
+    (visibility_modifier)
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (primitive_type)))
+    (block)))
+
+==================
+parameters: const, default value, multiple
+==================
+
+fn f(const x: i32, b: i32 = 10, c: i8): i8 {
+  return c;
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (primitive_type))
+      (parameter
+        (identifier)
+        (primitive_type)
+        (number_literal))
+      (parameter
+        (identifier)
+        (primitive_type)))
+    (primitive_type)
+    (block
+      (return_statement
+        (identifier)))))
+
+==================
+extern function with variadic
+==================
+
+extern fn printf(fmt: cstr, ...): i32;
+
+---
+
+(source_file
+  (extern_function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (primitive_type))
+      (variadic_parameter))
+    (primitive_type)))
+
+==================
+extern function with only variadic
+==================
+
+extern fn go(...): i32;
+
+---
+
+(source_file
+  (extern_function_declaration
+    (identifier)
+    (parameter_list
+      (variadic_parameter))
+    (primitive_type)))
+
+==================
+named variadic parameter
+==================
+
+extern fn f(args: ...): i32;
+
+---
+
+(source_file
+  (extern_function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)))
+    (primitive_type)))
+
+==================
+struct declaration with fields and defaults
+==================
+
+struct Config {
+  verbose: bool = false,
+  level: i32 = 1,
+}
+
+---
+
+(source_file
+  (struct_declaration
+    (identifier)
+    (field_declaration
+      (identifier)
+      (primitive_type)
+      (boolean_literal))
+    (field_declaration
+      (identifier)
+      (primitive_type)
+      (number_literal))))
+
+==================
+struct with methods and self
+==================
+
+struct Point {
+  x: i32,
+  y: i32,
+
+  fn sum(self): i32 {
+    return self.x + self.y;
+  }
+
+  pub fn scale(self, k: i32) {
+    self.x = self.x * k;
+  }
+}
+
+---
+
+(source_file
+  (struct_declaration
+    (identifier)
+    (field_declaration
+      (identifier)
+      (primitive_type))
+    (field_declaration
+      (identifier)
+      (primitive_type))
+    (function_declaration
+      (identifier)
+      (parameter_list
+        (parameter
+          (identifier)))
+      (primitive_type)
+      (block
+        (return_statement
+          (binary_expression
+            (field_expression
+              (identifier)
+              (identifier))
+            (field_expression
+              (identifier)
+              (identifier))))))
+    (function_declaration
+      (visibility_modifier)
+      (identifier)
+      (parameter_list
+        (parameter
+          (identifier))
+        (parameter
+          (identifier)
+          (primitive_type)))
+      (block
+        (assignment_statement
+          (field_expression
+            (identifier)
+            (identifier))
+          (binary_expression
+            (field_expression
+              (identifier)
+              (identifier))
+            (identifier)))))))
+
+==================
+struct fields without commas
+==================
+
+struct Pair {
+  a: i32
+  b: i32
+}
+
+---
+
+(source_file
+  (struct_declaration
+    (identifier)
+    (field_declaration
+      (identifier)
+      (primitive_type))
+    (field_declaration
+      (identifier)
+      (primitive_type))))
+
+==================
+enum declaration
+==================
+
+enum TokenKind {
+  Ident,
+  Number,
+  Plus,
+}
+
+---
+
+(source_file
+  (enum_declaration
+    (identifier)
+    (enum_member
+      (identifier))
+    (enum_member
+      (identifier))
+    (enum_member
+      (identifier))))
+
+==================
+enum with custom values
+==================
+
+enum Mode {
+  Compile = 255,
+  Tokenize,
+  Ast = 500,
+  Neg = -1,
+}
+
+---
+
+(source_file
+  (enum_declaration
+    (identifier)
+    (enum_member
+      (identifier)
+      (number_literal))
+    (enum_member
+      (identifier))
+    (enum_member
+      (identifier)
+      (number_literal))
+    (enum_member
+      (identifier)
+      (number_literal))))
+
+==================
+tagged union enum with payloads and method
+==================
+
+enum Value {
+  Nil,
+  Int: i64,
+  Str: str,
+
+  fn describe(self): i32 {
+    return 0;
+  }
+}
+
+---
+
+(source_file
+  (enum_declaration
+    (identifier)
+    (enum_member
+      (identifier))
+    (enum_member
+      (identifier)
+      (primitive_type))
+    (enum_member
+      (identifier)
+      (primitive_type))
+    (function_declaration
+      (identifier)
+      (parameter_list
+        (parameter
+          (identifier)))
+      (primitive_type)
+      (block
+        (return_statement
+          (number_literal))))))
+
+==================
+global bindings
+==================
+
+pub const MAX: i32 = 100;
+let counter: i32 = 0;
+
+---
+
+(source_file
+  (variable_declaration
+    (visibility_modifier)
+    (identifier)
+    (primitive_type)
+    (number_literal))
+  (variable_declaration
+    (identifier)
+    (primitive_type)
+    (number_literal)))
+
+==================
+import binding
+==================
+
+const std = import("std");
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (import_expression
+      (string_literal))))

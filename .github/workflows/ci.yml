@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Weekly tripwire: catches zup syntax landing upstream that the
+    # grammar doesn't parse yet.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v31
+
+      - name: Generated parser is in sync with grammar.js
+        run: |
+          nix shell nixpkgs#tree-sitter nixpkgs#nodejs -c tree-sitter generate
+          git diff --exit-code -- src/
+
+      - name: Corpus tests
+        run: nix shell nixpkgs#tree-sitter nixpkgs#nodejs nixpkgs#gcc -c tree-sitter test
+
+      - name: Flake packages build
+        run: nix build .#tree-sitter-zup .#tree-sitter-zup-queries
+
+  zup-corpus:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          repository: hent0/zup
+          path: zup-upstream
+
+      - uses: cachix/install-nix-action@v31
+
+      - name: Record upstream commit
+        run: git -C zup-upstream log -1 --oneline
+
+      - name: Parse zup examples/ and std/ (fails on any ERROR node)
+        run: |
+          find zup-upstream/examples zup-upstream/std -name '*.zup' -print0 \
+            | xargs -0 nix shell nixpkgs#tree-sitter nixpkgs#nodejs nixpkgs#gcc -c \
+                tree-sitter parse --quiet --stat all

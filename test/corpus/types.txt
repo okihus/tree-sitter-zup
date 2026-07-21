@@ -1,0 +1,175 @@
+==================
+all primitive types
+==================
+
+fn f(a: void, b: bool, c: i8, d: u8, e: i16, g: u16, h: i32, i: u32, j: i64, k: u64, l: f32, m: f64, n: cstr, o: str) {
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (primitive_type))
+      (parameter
+        (identifier)
+        (primitive_type))
+      (parameter
+        (identifier)
+        (primitive_type))
+      (parameter
+        (identifier)
+        (primitive_type))
+      (parameter
+        (identifier)
+        (primitive_type))
+      (parameter
+        (identifier)
+        (primitive_type))
+      (parameter
+        (identifier)
+        (primitive_type))
+      (parameter
+        (identifier)
+        (primitive_type))
+      (parameter
+        (identifier)
+        (primitive_type))
+      (parameter
+        (identifier)
+        (primitive_type))
+      (parameter
+        (identifier)
+        (primitive_type))
+      (parameter
+        (identifier)
+        (primitive_type))
+      (parameter
+        (identifier)
+        (primitive_type))
+      (parameter
+        (identifier)
+        (primitive_type)))
+    (block)))
+
+==================
+optional and pointer types
+==================
+
+fn f(a: ?i32, b: *u8, c: ?*i64, d: *?str) {
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (optional_type
+          (primitive_type)))
+      (parameter
+        (identifier)
+        (pointer_type
+          (primitive_type)))
+      (parameter
+        (identifier)
+        (optional_type
+          (pointer_type
+            (primitive_type))))
+      (parameter
+        (identifier)
+        (pointer_type
+          (optional_type
+            (primitive_type)))))
+    (block)))
+
+==================
+slice and array types
+==================
+
+fn f(a: []i32, b: [3]i32, c: [_]str, d: [][]u8) {
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (slice_type
+          (primitive_type)))
+      (parameter
+        (identifier)
+        (array_type
+          (number_literal)
+          (primitive_type)))
+      (parameter
+        (identifier)
+        (array_type
+          (primitive_type)))
+      (parameter
+        (identifier)
+        (slice_type
+          (slice_type
+            (primitive_type)))))
+    (block)))
+
+==================
+named and qualified types
+==================
+
+fn f(a: Point, b: std.mem.Arena): flag.FlagSet {
+  return b;
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (type_identifier))
+      (parameter
+        (identifier)
+        (qualified_type
+          (identifier)
+          (identifier)
+          (type_identifier))))
+    (qualified_type
+      (identifier)
+      (type_identifier))
+    (block
+      (return_statement
+        (identifier)))))
+
+==================
+optional slice of qualified type
+==================
+
+fn f(a: ?[]std.flag.Flag) {
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (optional_type
+          (slice_type
+            (qualified_type
+              (identifier)
+              (identifier)
+              (type_identifier))))))
+    (block)))
