@@ -7,7 +7,6 @@
   (struct_literal)
   (array_literal)
   (match_expression)
-  (match_arm)
 ] @indent.begin
 
 [

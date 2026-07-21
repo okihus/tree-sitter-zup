@@ -10,8 +10,8 @@ operator precedence mirror the reference implementation's `src/parser.c`.
 
 Last validated against zup commit
 [`31a0523`](https://github.com/hent0/zup/commit/31a0523038a3165ff397b04125427db008a1ce50)
-(2026-07-13): all of `examples/`, `std/`, and the valid `tests/parse/` sources
-parse with zero `ERROR` nodes. A weekly CI job re-checks against zup `HEAD`.
+(2026-07-13): all of `examples/` and `std/` parse with zero `ERROR` nodes.
+A weekly CI job re-checks against zup `HEAD`.
 
 ## Neovim (nvf)
 
@@ -58,7 +58,8 @@ or `devenv shell`) providing the tree-sitter CLI, Node.js, and a C compiler.
 ```sh
 tree-sitter generate   # grammar.js -> src/ (commit the result)
 tree-sitter test       # corpus tests in test/corpus/
-check-zup-corpus       # parse ../zup's examples/ and std/, fail on ERROR nodes
+check-zup-corpus [dir] # parse a zup checkout's examples/ and std/, fail on
+                       # ERROR nodes (defaults to ~/Projects/zup)
 ```
 
 `src/` is generated but committed, like other tree-sitter grammars, so

@@ -23,3 +23,6 @@ dist/
 
 # tree-sitter dev artifacts
 log.html
+
+# nix build output
+result
