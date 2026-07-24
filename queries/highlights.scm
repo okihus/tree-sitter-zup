@@ -118,7 +118,10 @@
 
 (visibility_modifier) @keyword.modifier
 
-"extern" @keyword.modifier
+[
+  "extern"
+  "builtin"
+] @keyword.modifier
 
 [
   "as"

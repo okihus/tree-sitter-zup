@@ -118,6 +118,23 @@ extern fn f(args: ...): i32;
     (primitive_type)))
 
 ==================
+builtin function declaration
+==================
+
+builtin fn abs(x: i32): i32;
+
+---
+
+(source_file
+  (extern_function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (primitive_type)))
+    (primitive_type)))
+
+==================
 struct declaration with fields and defaults
 ==================
 

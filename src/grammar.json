@@ -125,8 +125,17 @@
           ]
         },
         {
-          "type": "STRING",
-          "value": "extern"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "extern"
+            },
+            {
+              "type": "STRING",
+              "value": "builtin"
+            }
+          ]
         },
         {
           "type": "STRING",

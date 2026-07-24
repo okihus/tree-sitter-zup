@@ -85,7 +85,7 @@ export default grammar({
     extern_function_declaration: ($) =>
       seq(
         optional($.visibility_modifier),
-        "extern",
+        choice("extern", "builtin"),
         "fn",
         field("name", $.identifier),
         field("parameters", $.parameter_list),

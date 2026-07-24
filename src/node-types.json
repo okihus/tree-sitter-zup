@@ -1807,6 +1807,10 @@
     "named": false
   },
   {
+    "type": "builtin",
+    "named": false
+  },
+  {
     "type": "char_literal",
     "named": true
   },
