@@ -72,9 +72,10 @@
 
 (number_literal) @number
 
-; Decimal digits followed by '.' or an exponent — never hex (0xFEED).
+; Decimal digits, separators included, followed by '.' or an exponent — never
+; hex (0xFEED).
 ((number_literal) @number.float
-  (#match? @number.float "^[0-9]+(\\.|[eE])"))
+  (#match? @number.float "^[0-9][0-9_]*(\\.|[eE])"))
 
 (char_literal) @character
 

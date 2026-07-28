@@ -582,6 +582,76 @@ fn f() {
         (number_literal)))))
 
 ==================
+number literals with digit separators
+==================
+
+fn f() {
+  let a = 1_000_000;
+  let b = 0xDEAD_BEEF;
+  let c = 0x_FF;
+  let d = 1__000;
+  let e = 3.141_592;
+  let g = 1_000.000_1;
+  let h = 1e1_0;
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (block
+      (variable_declaration
+        (identifier)
+        (number_literal))
+      (variable_declaration
+        (identifier)
+        (number_literal))
+      (variable_declaration
+        (identifier)
+        (number_literal))
+      (variable_declaration
+        (identifier)
+        (number_literal))
+      (variable_declaration
+        (identifier)
+        (number_literal))
+      (variable_declaration
+        (identifier)
+        (number_literal))
+      (variable_declaration
+        (identifier)
+        (number_literal)))))
+
+==================
+a '_' with no digit after it ends the number literal
+==================
+
+fn f() {
+  let a = 1_foo;
+  let b = 1e_10;
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (block
+      (variable_declaration
+        (identifier)
+        (ERROR
+          (number_literal))
+        (identifier))
+      (variable_declaration
+        (identifier)
+        (ERROR
+          (number_literal))
+        (identifier)))))
+
+==================
 char literals
 ==================
 

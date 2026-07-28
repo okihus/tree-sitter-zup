@@ -493,11 +493,17 @@ export default grammar({
 
     identifier: (_) => /[a-zA-Z_][a-zA-Z0-9_]*/,
 
+    // A '_' run only separates digits: it belongs to the literal when a digit
+    // valid for the current base follows it, mirroring lexer.zup's digits(),
+    // which then strips the separators from the token text. A literal still
+    // starts with a digit, and the digit after '.', 'e' or its sign is still
+    // required, so `1_foo`, `1_.0` and `1e_10` stop the literal at the '_'
+    // and leave it to the following token.
     number_literal: (_) =>
       token(
         choice(
-          /0[xX][0-9a-fA-F]+/,
-          /[0-9]+(\.[0-9]+)?([eE][+-]?[0-9]+)?/,
+          /0[xX](_*[0-9a-fA-F])+/,
+          /[0-9](_*[0-9])*(\.[0-9](_*[0-9])*)?([eE][+-]?[0-9](_*[0-9])*)?/,
         ),
       ),
 

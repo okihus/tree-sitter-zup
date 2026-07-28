@@ -122,6 +122,31 @@ fn f(a: []i32, b: [3]i32, c: [_]str, d: [][]u8) {
     (block)))
 
 ==================
+array size with digit separators
+==================
+
+fn f(a: [1_0]i32, b: [0x1_0]u8) {
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (array_type
+          (number_literal)
+          (primitive_type)))
+      (parameter
+        (identifier)
+        (array_type
+          (number_literal)
+          (primitive_type))))
+    (block)))
+
+==================
 named and qualified types
 ==================
 
