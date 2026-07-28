@@ -292,6 +292,27 @@ enum Mode {
       (number_literal))))
 
 ==================
+enum values with digit separators
+==================
+
+enum Mask {
+  Small = 1_0,
+  Big = 0x1_0,
+}
+
+---
+
+(source_file
+  (enum_declaration
+    (identifier)
+    (enum_member
+      (identifier)
+      (number_literal))
+    (enum_member
+      (identifier)
+      (number_literal))))
+
+==================
 tagged union enum with payloads and method
 ==================
 
