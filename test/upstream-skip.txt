@@ -1,0 +1,17 @@
+# Upstream test bodies that check-zup-corpus.sh must not parse, beyond the two
+# rules the script applies automatically (tests whose --EXPECTERR-- carries the
+# compiler's own "(got TOKEN_...)" parse diagnostic, and all of tests/lexer/,
+# whose bodies are bare token streams rather than programs).
+#
+# Paths are relative to the zup checkout's tests/ directory. Everything listed
+# here is a known grammar gap, not an intentionally invalid fixture — each line
+# is a bug we owe, so keep the reason specific enough to act on.
+
+# Postfix ++/-- in expression position: `const a = n++;`, `take(k++, k++)`,
+# `arr[i++] = 10`, `ctr.n++`. The grammar has update_statement but no update
+# *expression*. Fixing it touches the statement/expression boundary and would
+# likely retire the update_statement node type, so it needs its own change.
+compile/post_incr_expr.zupt
+ir/c/005_for.zupt
+sema/post_incr_const.zupt
+sema/post_incr_non_lvalue.zupt

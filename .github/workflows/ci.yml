@@ -48,15 +48,10 @@ jobs:
       - name: Record upstream commit
         run: git -C zup-upstream log -1 --oneline
 
-      - name: Parse zup examples/ and std/ (fails on any ERROR node)
+      # Parses examples/, std/, the .zupt section structure, and — unlike a bare
+      # `tree-sitter parse`, which cannot resolve injections — the zup inside
+      # each --FILE-- body. Fails on any ERROR or MISSING node.
+      - name: Parse zup corpus (fails on any ERROR node)
         run: |
-          find zup-upstream/examples zup-upstream/std -name '*.zup' -print0 \
-            | xargs -0 nix shell nixpkgs#tree-sitter nixpkgs#nodejs nixpkgs#gcc -c \
-                tree-sitter parse --quiet --stat all
-
-      - name: Parse zup tests/ *.zupt files (fails on any ERROR node)
-        working-directory: zupt
-        run: |
-          find ../zup-upstream/tests -name '*.zupt' -print0 \
-            | xargs -0 nix shell nixpkgs#tree-sitter nixpkgs#nodejs nixpkgs#gcc -c \
-                tree-sitter parse --quiet --stat all
+          nix shell nixpkgs#tree-sitter nixpkgs#nodejs nixpkgs#gcc -c \
+            ./scripts/check-zup-corpus.sh zup-upstream

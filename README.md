@@ -10,13 +10,17 @@
 
 The grammar is a **permissive superset** of what the zup compiler accepts:
 it is meant for editors, so it parses half-typed and slightly-invalid code
-gracefully rather than enforcing the compiler's semantic rules. Structure and
-operator precedence mirror the reference implementation's `src/parser.c`.
+gracefully rather than enforcing the compiler's semantic rules. Outright syntax
+errors, though, stay errors. Structure and operator precedence mirror the
+reference implementation's `src/parser.zup` (the compiler is self-hosted).
 
 Last validated against zup commit
-[`31a0523`](https://github.com/hent0/zup/commit/31a0523038a3165ff397b04125427db008a1ce50)
-(2026-07-13): all of `examples/` and `std/` parse with zero `ERROR` nodes.
-A weekly CI job re-checks against zup `HEAD`.
+[`914eb48`](https://github.com/hent0/zup/commit/914eb48583a8d02d6ffa0b8b41cf562ef050b18f)
+(2026-07-30): all of `examples/` and `std/`, plus 560 of the 610 `--FILE--`
+bodies in `tests/`, parse with zero `ERROR` nodes. The 50 exclusions are
+tests asserting a parse error, `tests/lexer/` token-stream fixtures, and the
+known gaps listed in `test/upstream-skip.txt`. A weekly CI job re-checks
+against zup `HEAD`.
 
 ## Neovim (nvf)
 
@@ -77,9 +81,9 @@ or `devenv shell`) providing the tree-sitter CLI, Node.js, and a C compiler.
 ```sh
 tree-sitter generate   # grammar.js -> src/ (commit the result)
 tree-sitter test       # corpus tests in test/corpus/
-check-zup-corpus [dir] # parse a zup checkout's examples/, std/, and tests/
-                       # *.zupt files, fail on ERROR nodes (defaults to
-                       # ~/Projects/zup)
+check-zup-corpus [dir] # parse a zup checkout's examples/ and std/, the *.zupt
+                       # section structure, and the zup inside each --FILE--
+                       # body; fail on ERROR nodes (defaults to ~/Projects/zup)
 ```
 
 The zupt grammar lives in `zupt/`; run `tree-sitter generate`/`test` from
