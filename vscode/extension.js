@@ -9,6 +9,7 @@ const { createHighlighter } = require("./highlighting");
 const TOKEN_TYPES = [
   "namespace",
   "type",
+  "interface",
   "parameter",
   "variable",
   "property",

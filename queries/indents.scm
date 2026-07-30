@@ -2,6 +2,7 @@
   (block)
   (struct_declaration)
   (enum_declaration)
+  (interface_declaration)
   (parameter_list)
   (argument_list)
   (struct_literal)

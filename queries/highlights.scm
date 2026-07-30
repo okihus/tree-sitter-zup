@@ -30,12 +30,29 @@
   type: (field_expression
     field: (identifier) @type))
 
+; The two positions where the grammar knows a name is an interface. Uses in
+; type position (`fn run(w: Writer)`) are indistinguishable from a struct, so
+; those stay plain @type. Editors that don't know @type.interface fall back to
+; @type by truncating at the last dot.
+(interface_declaration
+  name: (identifier) @type.interface)
+
+(implements_list
+  (type_identifier) @type.interface)
+
+(implements_list
+  (qualified_type
+    name: (type_identifier) @type.interface))
+
 ; --- Functions and parameters ----------------------------------------------
 
 (function_declaration
   name: (identifier) @function)
 
 (extern_function_declaration
+  name: (identifier) @function)
+
+(method_signature
   name: (identifier) @function)
 
 (call_expression
@@ -94,6 +111,7 @@
   "const"
   "struct"
   "enum"
+  "interface"
   "defer"
 ] @keyword
 

@@ -19,6 +19,7 @@ const CAPTURE_TOKENS = {
   module: { type: "namespace" },
   type: { type: "type" },
   "type.builtin": { type: "type", modifiers: ["defaultLibrary"] },
+  "type.interface": { type: "interface" },
   function: { type: "function", modifiers: ["declaration"] },
   "function.call": { type: "function" },
   "function.method.call": { type: "method" },
