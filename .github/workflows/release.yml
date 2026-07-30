@@ -12,7 +12,7 @@ jobs:
   vsix:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: cachix/install-nix-action@v31
 
@@ -41,7 +41,7 @@ jobs:
         working-directory: vscode
         run: nix shell nixpkgs#nodejs -c npx --yes @vscode/vsce package
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: zup-language-vsix
           path: vscode/*.vsix
