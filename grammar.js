@@ -4,9 +4,10 @@
  * @license MIT
  *
  * A permissive superset of the zup language as implemented by the reference
- * compiler (https://github.com/hent0/zup, src/parser.c). Semantic
- * restrictions (valid assignment targets, where variadics may appear, etc.)
- * are intentionally not enforced — the compiler owns those.
+ * compiler (https://github.com/hent0/zup, src/parser.zup — the compiler is
+ * self-hosted). Semantic restrictions (valid assignment targets, where
+ * variadics may appear, etc.) are intentionally not enforced — the compiler
+ * owns those. Outright syntax errors, though, stay errors.
  */
 
 /// <reference types="tree-sitter-cli/dsl" />
@@ -67,6 +68,7 @@ export default grammar({
         $.extern_function_declaration,
         $.struct_declaration,
         $.enum_declaration,
+        $.interface_declaration,
         $.variable_declaration,
       ),
 
@@ -111,10 +113,17 @@ export default grammar({
         optional($.visibility_modifier),
         "struct",
         field("name", $.identifier),
+        optional(field("implements", $.implements_list)),
         "{",
         repeat(choice($.field_declaration, $.function_declaration)),
         "}",
       ),
+
+    // The interfaces a struct implements. Entries are full types, mirroring
+    // parseStruct's parseType() call, so `[]Foo` parses here and the
+    // compiler's resolveInterface owns rejecting it. No trailing comma:
+    // parseStruct would try to parse a type after it and fail.
+    implements_list: ($) => seq(":", commaSep1($._type)),
 
     // Commas between struct fields are optional in parser.c.
     field_declaration: ($) =>
@@ -141,8 +150,42 @@ export default grammar({
       seq(
         field("name", $.identifier),
         optional(seq(":", field("type", $._type))),
-        optional(seq("=", field("value", seq(optional("-"), $.number_literal)))),
+        optional(
+          seq(
+            "=",
+            field(
+              "value",
+              choice(seq(optional("-"), $.number_literal), $.char_literal),
+            ),
+          ),
+        ),
         optional(","),
+      ),
+
+    interface_declaration: ($) =>
+      seq(
+        optional($.visibility_modifier),
+        "interface",
+        field("name", $.identifier),
+        "{",
+        repeat($.method_signature),
+        "}",
+      ),
+
+    // A bodiless method signature. Like extern_function_declaration the ';'
+    // is required and no block may follow: parseSignature reports a hard
+    // parse error there, so it stays an error here. 'pub' is accepted (the
+    // compiler only warns), and parameter_list is reused as-is, so neither
+    // the 'self' receiver nor the no-variadics rule is enforced — both are
+    // diagnostics over a syntactically valid token stream.
+    method_signature: ($) =>
+      seq(
+        optional($.visibility_modifier),
+        "fn",
+        field("name", $.identifier),
+        field("parameters", $.parameter_list),
+        optional(seq(":", field("return_type", $._type))),
+        ";",
       ),
 
     variable_declaration: ($) =>

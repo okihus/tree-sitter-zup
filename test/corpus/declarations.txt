@@ -382,3 +382,194 @@ const std = import("std");
     (identifier)
     (import_expression
       (string_literal))))
+
+==================
+interface declaration
+==================
+
+interface Writer {
+  fn write(self, n: i32): i32;
+  fn id(self): i32;
+}
+
+---
+
+(source_file
+  (interface_declaration
+    (identifier)
+    (method_signature
+      (identifier)
+      (parameter_list
+        (parameter
+          (identifier))
+        (parameter
+          (identifier)
+          (primitive_type)))
+      (primitive_type))
+    (method_signature
+      (identifier)
+      (parameter_list
+        (parameter
+          (identifier)))
+      (primitive_type))))
+
+==================
+public interface and empty interface body
+==================
+
+pub interface Greeter {
+}
+
+interface Marker {}
+
+---
+
+(source_file
+  (interface_declaration
+    (visibility_modifier)
+    (identifier))
+  (interface_declaration
+    (identifier)))
+
+==================
+interface signatures: pub, no self receiver, variadic all parse
+==================
+
+interface Loose {
+  pub fn a(self): i32;
+  fn b(n: i32);
+  fn c(self, ...): i32;
+}
+
+---
+
+(source_file
+  (interface_declaration
+    (identifier)
+    (method_signature
+      (visibility_modifier)
+      (identifier)
+      (parameter_list
+        (parameter
+          (identifier)))
+      (primitive_type))
+    (method_signature
+      (identifier)
+      (parameter_list
+        (parameter
+          (identifier)
+          (primitive_type))))
+    (method_signature
+      (identifier)
+      (parameter_list
+        (parameter
+          (identifier))
+        (variadic_parameter))
+      (primitive_type))))
+
+==================
+struct implementing an interface
+==================
+
+struct File : Writer {
+  fd: i32,
+
+  pub fn write(self, n: i32): i32 {
+    return self.fd + n;
+  }
+}
+
+---
+
+(source_file
+  (struct_declaration
+    (identifier)
+    (implements_list
+      (type_identifier))
+    (field_declaration
+      (identifier)
+      (primitive_type))
+    (function_declaration
+      (visibility_modifier)
+      (identifier)
+      (parameter_list
+        (parameter
+          (identifier))
+        (parameter
+          (identifier)
+          (primitive_type)))
+      (primitive_type)
+      (block
+        (return_statement
+          (binary_expression
+            (field_expression
+              (identifier)
+              (identifier))
+            (identifier)))))))
+
+==================
+struct implementing multiple interfaces, one qualified
+==================
+
+struct Both : m.Greeter, Beta {
+  v: i32,
+}
+
+---
+
+(source_file
+  (struct_declaration
+    (identifier)
+    (implements_list
+      (qualified_type
+        (identifier)
+        (type_identifier))
+      (type_identifier))
+    (field_declaration
+      (identifier)
+      (primitive_type))))
+
+==================
+an interface method body is a syntax error
+==================
+
+interface Writer {
+  fn write(self): i32 {
+    return 0;
+  }
+}
+
+---
+
+(source_file
+  (interface_declaration
+    (identifier)
+    (method_signature
+      (identifier)
+      (parameter_list
+        (parameter
+          (identifier)))
+      (primitive_type)
+      (ERROR
+        (number_literal))))
+  (ERROR))
+
+==================
+enum value from a char literal
+==================
+
+enum Opt {
+  Output = 'o',
+  Next,
+}
+
+---
+
+(source_file
+  (enum_declaration
+    (identifier)
+    (enum_member
+      (identifier)
+      (char_literal))
+    (enum_member
+      (identifier))))

@@ -16,6 +16,10 @@
         "named": true
       },
       {
+        "type": "interface_declaration",
+        "named": true
+      },
+      {
         "type": "struct_declaration",
         "named": true
       },
@@ -681,6 +685,10 @@
             "named": false
           },
           {
+            "type": "char_literal",
+            "named": true
+          },
+          {
             "type": "number_literal",
             "named": true
           }
@@ -990,6 +998,21 @@
     }
   },
   {
+    "type": "implements_list",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "_type",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "import_expression",
     "named": true,
     "fields": {
@@ -1029,6 +1052,36 @@
           }
         ]
       }
+    }
+  },
+  {
+    "type": "interface_declaration",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "method_signature",
+          "named": true
+        },
+        {
+          "type": "visibility_modifier",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -1116,6 +1169,52 @@
       "types": [
         {
           "type": "_expression",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "method_signature",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "parameters": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "parameter_list",
+            "named": true
+          }
+        ]
+      },
+      "return_type": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "_type",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "visibility_modifier",
           "named": true
         }
       ]
@@ -1392,6 +1491,16 @@
     "type": "struct_declaration",
     "named": true,
     "fields": {
+      "implements": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "implements_list",
+            "named": true
+          }
+        ]
+      },
       "name": {
         "multiple": false,
         "required": true,
@@ -1896,6 +2005,10 @@
   },
   {
     "type": "in",
+    "named": false
+  },
+  {
+    "type": "interface",
     "named": false
   },
   {
