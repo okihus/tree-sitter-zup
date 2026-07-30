@@ -11,16 +11,9 @@
     pkgs.gcc
   ];
 
+  # Thin wrapper so the check has one implementation, shared with CI — see
+  # scripts/check-zup-corpus.sh for what it parses and what it skips.
   scripts.check-zup-corpus.exec = ''
-    # Parse the zup compiler repo's examples/, std/, and tests/ *.zupt files —
-    # fails on any ERROR node.
-    set -euo pipefail
-    zup_repo="$(realpath "''${1:-$HOME/Projects/zup}")"
-    repo_root="$DEVENV_ROOT"
-    find "$zup_repo/examples" "$zup_repo/std" -name '*.zup' -print0 \
-      | xargs -0 tree-sitter parse --quiet --stat all
-    cd "$repo_root/zupt"
-    find "$zup_repo/tests" -name '*.zupt' -print0 \
-      | xargs -0 tree-sitter parse --quiet --stat all
+    exec "$DEVENV_ROOT/scripts/check-zup-corpus.sh" "$@"
   '';
 }
