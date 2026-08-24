@@ -86,6 +86,10 @@
         "named": true
       },
       {
+        "type": "multiline_string_literal",
+        "named": true
+      },
+      {
         "type": "null_literal",
         "named": true
       },
@@ -2213,6 +2217,10 @@
   {
     "type": "match",
     "named": false
+  },
+  {
+    "type": "multiline_string_literal",
+    "named": true
   },
   {
     "type": "null_literal",

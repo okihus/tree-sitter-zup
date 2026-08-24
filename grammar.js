@@ -383,6 +383,7 @@ export default grammar({
         $.number_literal,
         $.char_literal,
         $.string_literal,
+        $.multiline_string_literal,
         $.boolean_literal,
         $.null_literal,
         $.array_literal,
@@ -628,6 +629,18 @@ export default grammar({
       seq('"', repeat(choice($.escape_sequence, /[^"\\]+/)), '"'),
 
     escape_sequence: (_) => token.immediate(/\\./),
+
+    // Zig-style multiline string (lexer.zup's multilineStringLiteral): a `\\`
+    // run reaches to end of line, backslashes and quotes included verbatim —
+    // there are no escapes inside one. The literal continues onto the next
+    // line only when nothing but spaces and tabs precedes that line's `\\`,
+    // so it is one token rather than a repeat() over per-line rules: extras
+    // would otherwise let a blank line or a comment sit inside the literal,
+    // where upstream instead ends it.
+    multiline_string_literal: (_) =>
+      token(
+        seq("\\\\", /[^\n]*/, repeat(seq(/\r?\n[ \t]*/, "\\\\", /[^\n]*/))),
+      ),
 
     boolean_literal: (_) => choice("true", "false"),
 
