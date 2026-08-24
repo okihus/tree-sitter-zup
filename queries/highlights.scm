@@ -23,6 +23,21 @@
 (enum_declaration
   name: (identifier) @type)
 
+; A declaration's own type parameters. generic_type's name needs no rule of
+; its own — the blanket (type_identifier) @type above already covers it.
+(type_parameters
+  (type_identifier) @type.parameter)
+
+; The name a use-site type argument list hangs off: `Pair<i32>.of(..)`,
+; `lit.Cell<i32>{..}`. Without these the base parses as a plain identifier
+; and highlights as @variable.
+(generic_instance
+  name: (identifier) @type)
+
+(generic_instance
+  name: (field_expression
+    field: (identifier) @type))
+
 (struct_literal
   type: (identifier) @type)
 

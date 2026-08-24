@@ -735,3 +735,170 @@ fn f() {
       (variable_declaration
         (identifier)
         (null_literal)))))
+
+==================
+explicit type arguments on a call
+==================
+
+fn f() {
+  const a = zero<i32>();
+  const b = firstOf<i64>(x, y);
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (block
+      (variable_declaration
+        (identifier)
+        (call_expression
+          (generic_instance
+            (identifier)
+            (type_arguments
+              (primitive_type)))
+          (argument_list)))
+      (variable_declaration
+        (identifier)
+        (call_expression
+          (generic_instance
+            (identifier)
+            (type_arguments
+              (primitive_type)))
+          (argument_list
+            (identifier)
+            (identifier)))))))
+
+==================
+type arguments before a static method call
+==================
+
+fn f() {
+  const p = Pair<i32>.of(2, 3);
+  let l = std.List<u32>.init(&arena);
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (block
+      (variable_declaration
+        (identifier)
+        (call_expression
+          (field_expression
+            (generic_instance
+              (identifier)
+              (type_arguments
+                (primitive_type)))
+            (identifier))
+          (argument_list
+            (number_literal)
+            (number_literal))))
+      (variable_declaration
+        (identifier)
+        (call_expression
+          (field_expression
+            (generic_instance
+              (field_expression
+                (identifier)
+                (identifier))
+              (type_arguments
+                (primitive_type)))
+            (identifier))
+          (argument_list
+            (unary_expression
+              (identifier))))))))
+
+==================
+type arguments on a struct literal
+==================
+
+fn f() {
+  const p = Pair<i32>{a: 2, b: 3};
+  const c = lit.Cell<i32>{v: 5};
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (block
+      (variable_declaration
+        (identifier)
+        (struct_literal
+          (generic_instance
+            (identifier)
+            (type_arguments
+              (primitive_type)))
+          (field_initializer
+            (identifier)
+            (number_literal))
+          (field_initializer
+            (identifier)
+            (number_literal))))
+      (variable_declaration
+        (identifier)
+        (struct_literal
+          (generic_instance
+            (field_expression
+              (identifier)
+              (identifier))
+            (type_arguments
+              (primitive_type)))
+          (field_initializer
+            (identifier)
+            (number_literal)))))))
+
+==================
+comparisons and shifts are not type arguments
+==================
+
+fn f() {
+  while i < n {
+    i += 1;
+  }
+  const s = x >> y;
+  const t = lo < hi ? 1 : 0;
+  const u = a < b;
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (block
+      (while_statement
+        (binary_expression
+          (identifier)
+          (identifier))
+        (block
+          (assignment_statement
+            (identifier)
+            (number_literal))))
+      (variable_declaration
+        (identifier)
+        (binary_expression
+          (identifier)
+          (identifier)))
+      (variable_declaration
+        (identifier)
+        (conditional_expression
+          (binary_expression
+            (identifier)
+            (identifier))
+          (number_literal)
+          (number_literal)))
+      (variable_declaration
+        (identifier)
+        (binary_expression
+          (identifier)
+          (identifier))))))

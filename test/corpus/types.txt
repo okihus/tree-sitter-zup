@@ -198,3 +198,166 @@ fn f(a: ?[]std.flag.Flag) {
               (identifier)
               (type_identifier))))))
     (block)))
+
+==================
+generic types
+==================
+
+fn f(a: Vec<i32>, b: Pair<i32, str>, c: std.List<u32>) {
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (generic_type
+          (type_identifier)
+          (type_arguments
+            (primitive_type))))
+      (parameter
+        (identifier)
+        (generic_type
+          (type_identifier)
+          (type_arguments
+            (primitive_type)
+            (primitive_type))))
+      (parameter
+        (identifier)
+        (generic_type
+          (qualified_type
+            (identifier)
+            (type_identifier))
+          (type_arguments
+            (primitive_type)))))
+    (block)))
+
+==================
+nested generic types split the closing '>'
+==================
+
+fn f() {
+  let a: Vec<Vec<i32>>;
+  let b: Vec<Vec<Vec<i32>>>;
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (block
+      (variable_declaration
+        (identifier)
+        (generic_type
+          (type_identifier)
+          (type_arguments
+            (generic_type
+              (type_identifier)
+              (type_arguments
+                (primitive_type))))))
+      (variable_declaration
+        (identifier)
+        (generic_type
+          (type_identifier)
+          (type_arguments
+            (generic_type
+              (type_identifier)
+              (type_arguments
+                (generic_type
+                  (type_identifier)
+                  (type_arguments
+                    (primitive_type)))))))))))
+
+==================
+'>' splits back out of '>=' before an initializer
+==================
+
+fn f() {
+  let a: Vec<i32>;
+  let b: Vec<i32>= a;
+  let c: Vec<Vec<i32>>= a;
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (block
+      (variable_declaration
+        (identifier)
+        (generic_type
+          (type_identifier)
+          (type_arguments
+            (primitive_type))))
+      (variable_declaration
+        (identifier)
+        (generic_type
+          (type_identifier)
+          (type_arguments
+            (primitive_type)))
+        (identifier))
+      (variable_declaration
+        (identifier)
+        (generic_type
+          (type_identifier)
+          (type_arguments
+            (generic_type
+              (type_identifier)
+              (type_arguments
+                (primitive_type)))))
+        (identifier)))))
+
+==================
+generic instances compose with every type shape
+==================
+
+struct Holder<T> {
+  maybe: ?Vec<T>,
+  many: []Vec<T>,
+  ptr: *Vec<T>,
+  fixed: [2]Vec<T>,
+}
+
+---
+
+(source_file
+  (struct_declaration
+    (identifier)
+    (type_parameters
+      (type_identifier))
+    (field_declaration
+      (identifier)
+      (optional_type
+        (generic_type
+          (type_identifier)
+          (type_arguments
+            (type_identifier)))))
+    (field_declaration
+      (identifier)
+      (slice_type
+        (generic_type
+          (type_identifier)
+          (type_arguments
+            (type_identifier)))))
+    (field_declaration
+      (identifier)
+      (pointer_type
+        (generic_type
+          (type_identifier)
+          (type_arguments
+            (type_identifier)))))
+    (field_declaration
+      (identifier)
+      (array_type
+        (number_literal)
+        (generic_type
+          (type_identifier)
+          (type_arguments
+            (type_identifier)))))))
