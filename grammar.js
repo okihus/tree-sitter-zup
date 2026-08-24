@@ -53,6 +53,18 @@ export default grammar({
     // `=> {}` in a match arm: empty block vs. empty anonymous struct
     // literal. The literal's negative dynamic precedence makes the block win.
     [$.struct_literal, $.block],
+    // `<` after a name is either a comparison or the start of a type
+    // argument list. GLR splits and resolves on what follows the closer —
+    // `(`, `.` or `{` means type arguments — which is exactly the peek
+    // parser.zup's looksLikeTypeArgs()/followsTypeArgs() performs. For the
+    // split to happen at all, generic_instance must carry no static
+    // precedence: give it PREC.postfix and precedence decides the shift
+    // deterministically instead, turning every `while i < n {` into a
+    // half-parsed type argument list.
+    [$._expression, $.generic_instance],
+    // `Foo<` in type position: a bare named type that happens to be
+    // followed by `<`, or a generic instance.
+    [$._type, $.generic_type],
   ],
 
   rules: {
@@ -79,6 +91,7 @@ export default grammar({
         optional($.visibility_modifier),
         "fn",
         field("name", $.identifier),
+        optional(field("type_parameters", $.type_parameters)),
         field("parameters", $.parameter_list),
         optional(seq(":", field("return_type", $._type))),
         field("body", $.block),
@@ -90,6 +103,7 @@ export default grammar({
         choice("extern", "builtin"),
         "fn",
         field("name", $.identifier),
+        optional(field("type_parameters", $.type_parameters)),
         field("parameters", $.parameter_list),
         optional(seq(":", field("return_type", $._type))),
         ";",
@@ -113,6 +127,7 @@ export default grammar({
         optional($.visibility_modifier),
         "struct",
         field("name", $.identifier),
+        optional(field("type_parameters", $.type_parameters)),
         optional(field("implements", $.implements_list)),
         "{",
         repeat(choice($.field_declaration, $.function_declaration)),
@@ -141,6 +156,7 @@ export default grammar({
         optional($.visibility_modifier),
         "enum",
         field("name", $.identifier),
+        optional(field("type_parameters", $.type_parameters)),
         "{",
         repeat(choice($.enum_member, $.function_declaration)),
         "}",
@@ -183,6 +199,7 @@ export default grammar({
         optional($.visibility_modifier),
         "fn",
         field("name", $.identifier),
+        optional(field("type_parameters", $.type_parameters)),
         field("parameters", $.parameter_list),
         optional(seq(":", field("return_type", $._type))),
         ";",
@@ -202,9 +219,25 @@ export default grammar({
     // Types
     // ---------------------------------------------------------------
 
+    // Declaration-site type parameters. Accepted everywhere parser.zup calls
+    // parseTypeParams(): fn, extern fn, method, interface method signature,
+    // struct and enum — but not on the interface itself. Duplicate names,
+    // extern generics and generic methods are all diagnostics over a valid
+    // token stream, so they parse here and the compiler owns rejecting them.
+    type_parameters: ($) =>
+      seq("<", commaSep1(alias($.identifier, $.type_identifier)), ">"),
+
+    // Use-site type arguments. No trailing comma: parseTypeArgs would try to
+    // parse a type after it and fail. Nested closers need no special
+    // handling — in a state where only `>` is valid, `>>` and `>=` are not
+    // tokens at all, so tree-sitter's lexer splits them the way
+    // parser.zup's expectGreater() does by hand.
+    type_arguments: ($) => seq("<", commaSep1($._type), ">"),
+
     _type: ($) =>
       choice(
         $.primitive_type,
+        $.generic_type,
         $.optional_type,
         $.pointer_type,
         $.slice_type,
@@ -229,6 +262,12 @@ export default grammar({
         "f64",
         "cstr",
         "str",
+      ),
+
+    generic_type: ($) =>
+      seq(
+        field("name", choice(alias($.identifier, $.type_identifier), $.qualified_type)),
+        field("type_arguments", $.type_arguments),
       ),
 
     optional_type: ($) => seq("?", field("element", $._type)),
@@ -372,10 +411,26 @@ export default grammar({
 
     sizeof_expression: ($) => seq("sizeof", "(", field("type", $._type), ")"),
 
+    // Type arguments in expression position: `zero<i32>()`,
+    // `Pair<i32>.of(2, 3)`, `Pair<i32>{a: 2}`. The base is a name or a field
+    // chain, never an arbitrary expression — parsePostfix() only tries type
+    // arguments when isField() holds, and parsePrimary() only for a bare Id.
+    // Deliberately not an _expression alternative on its own: a naked
+    // `a<b>` is a comparison chain, and only `(`, `.` or `{` promotes it,
+    // so generic_instance appears solely in those three parents.
+    generic_instance: ($) =>
+      seq(
+        field("name", choice($.identifier, $.field_expression)),
+        field("type_arguments", $.type_arguments),
+      ),
+
     call_expression: ($) =>
       prec(
         PREC.postfix,
-        seq(field("function", $._expression), field("arguments", $.argument_list)),
+        seq(
+          field("function", choice($._expression, $.generic_instance)),
+          field("arguments", $.argument_list),
+        ),
       ),
 
     argument_list: ($) => seq("(", commaSep($._expression), ")"),
@@ -383,7 +438,11 @@ export default grammar({
     field_expression: ($) =>
       prec(
         PREC.postfix,
-        seq(field("value", $._expression), ".", field("field", $.identifier)),
+        seq(
+          field("value", choice($._expression, $.generic_instance)),
+          ".",
+          field("field", $.identifier),
+        ),
       ),
 
     index_expression: ($) =>
@@ -482,7 +541,9 @@ export default grammar({
       prec.dynamic(
         -1,
         seq(
-          optional(field("type", choice($.identifier, $.field_expression))),
+          optional(
+            field("type", choice($.identifier, $.field_expression, $.generic_instance)),
+          ),
           "{",
           commaSep($.field_initializer),
           optional(","),

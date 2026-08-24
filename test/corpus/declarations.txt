@@ -573,3 +573,152 @@ enum Opt {
       (char_literal))
     (enum_member
       (identifier))))
+
+==================
+generic struct and enum declarations
+==================
+
+pub struct Vec<T> {
+  v: T,
+}
+
+struct Pair<T, U> {
+  a: T,
+  b: U,
+}
+
+enum Slot<T> {
+  Empty,
+  Full: T,
+}
+
+---
+
+(source_file
+  (struct_declaration
+    (visibility_modifier)
+    (identifier)
+    (type_parameters
+      (type_identifier))
+    (field_declaration
+      (identifier)
+      (type_identifier)))
+  (struct_declaration
+    (identifier)
+    (type_parameters
+      (type_identifier)
+      (type_identifier))
+    (field_declaration
+      (identifier)
+      (type_identifier))
+    (field_declaration
+      (identifier)
+      (type_identifier)))
+  (enum_declaration
+    (identifier)
+    (type_parameters
+      (type_identifier))
+    (enum_member
+      (identifier))
+    (enum_member
+      (identifier)
+      (type_identifier))))
+
+==================
+generic functions, methods and signatures
+==================
+
+fn firstOf<T>(a: T, b: T): T {
+  return a;
+}
+
+extern fn read<T>(fd: i32): T;
+
+struct Box {
+  v: i32,
+
+  pub fn map<U>(self): U {
+    return self.v;
+  }
+}
+
+interface Reader {
+  fn get<T>(self): T;
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (type_parameters
+      (type_identifier))
+    (parameter_list
+      (parameter
+        (identifier)
+        (type_identifier))
+      (parameter
+        (identifier)
+        (type_identifier)))
+    (type_identifier)
+    (block
+      (return_statement
+        (identifier))))
+  (extern_function_declaration
+    (identifier)
+    (type_parameters
+      (type_identifier))
+    (parameter_list
+      (parameter
+        (identifier)
+        (primitive_type)))
+    (type_identifier))
+  (struct_declaration
+    (identifier)
+    (field_declaration
+      (identifier)
+      (primitive_type))
+    (function_declaration
+      (visibility_modifier)
+      (identifier)
+      (type_parameters
+        (type_identifier))
+      (parameter_list
+        (parameter
+          (identifier)))
+      (type_identifier)
+      (block
+        (return_statement
+          (field_expression
+            (identifier)
+            (identifier))))))
+  (interface_declaration
+    (identifier)
+    (method_signature
+      (identifier)
+      (type_parameters
+        (type_identifier))
+      (parameter_list
+        (parameter
+          (identifier)))
+      (type_identifier))))
+
+==================
+duplicate type parameters parse
+==================
+
+struct Pair<T, T> {
+  a: T,
+}
+
+---
+
+(source_file
+  (struct_declaration
+    (identifier)
+    (type_parameters
+      (type_identifier)
+      (type_identifier))
+    (field_declaration
+      (identifier)
+      (type_identifier))))
