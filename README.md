@@ -15,9 +15,9 @@ errors, though, stay errors. Structure and operator precedence mirror the
 reference implementation's `src/parser.zup` (the compiler is self-hosted).
 
 Last validated against zup commit
-[`914eb48`](https://github.com/hent0/zup/commit/914eb48583a8d02d6ffa0b8b41cf562ef050b18f)
-(2026-07-30): all of `examples/` and `std/`, plus 560 of the 610 `--FILE--`
-bodies in `tests/`, parse with zero `ERROR` nodes. The 50 exclusions are
+[`9567df5`](https://github.com/hent0/zup/commit/9567df5)
+(2026-08-14): all of `examples/` and `std/`, plus 628 of the 681 `--FILE--`
+bodies in `tests/`, parse with zero `ERROR` nodes. The 53 exclusions are
 tests asserting a parse error, `tests/lexer/` token-stream fixtures, and the
 known gaps listed in `test/upstream-skip.txt`. A weekly CI job re-checks
 against zup `HEAD`.
