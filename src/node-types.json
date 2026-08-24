@@ -94,6 +94,10 @@
         "named": true
       },
       {
+        "type": "optional_chain_expression",
+        "named": true
+      },
+      {
         "type": "parenthesized_expression",
         "named": true
       },
@@ -1333,6 +1337,32 @@
     }
   },
   {
+    "type": "optional_chain_expression",
+    "named": true,
+    "fields": {
+      "field": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "_expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "optional_type",
     "named": true,
     "fields": {
@@ -2024,6 +2054,10 @@
   },
   {
     "type": "?",
+    "named": false
+  },
+  {
+    "type": "?.",
     "named": false
   },
   {

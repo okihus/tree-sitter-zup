@@ -902,3 +902,64 @@ fn f() {
         (binary_expression
           (identifier)
           (identifier))))))
+
+==================
+optional chaining
+==================
+
+fn f() {
+  const n = lg?.level;
+  lg?.info("hi");
+  const d = a?.b?.c;
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (block
+      (variable_declaration
+        (identifier)
+        (optional_chain_expression
+          (identifier)
+          (identifier)))
+      (expression_statement
+        (call_expression
+          (optional_chain_expression
+            (identifier)
+            (identifier))
+          (argument_list
+            (string_literal))))
+      (variable_declaration
+        (identifier)
+        (optional_chain_expression
+          (optional_chain_expression
+            (identifier)
+            (identifier))
+          (identifier))))))
+
+==================
+'?' followed by a space still starts a ternary
+==================
+
+fn f() {
+  const v = c ? .Some : .None;
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (block
+      (variable_declaration
+        (identifier)
+        (conditional_expression
+          (identifier)
+          (enum_literal
+            (identifier))
+          (enum_literal
+            (identifier)))))))

@@ -77,6 +77,10 @@
   function: (field_expression
     field: (identifier) @function.method.call))
 
+(call_expression
+  function: (optional_chain_expression
+    field: (identifier) @function.method.call))
+
 (parameter
   name: (identifier) @variable.parameter)
 
@@ -92,6 +96,9 @@
   name: (identifier) @variable.member)
 
 (field_expression
+  field: (identifier) @variable.member)
+
+(optional_chain_expression
   field: (identifier) @variable.member)
 
 (enum_member
@@ -187,6 +194,7 @@
   ";"
   ":"
   "."
+  "?."
 ] @punctuation.delimiter
 
 (match_arm

@@ -397,6 +397,7 @@ export default grammar({
         $.slice_expression,
         $.unwrap_expression,
         $.propagate_expression,
+        $.optional_chain_expression,
         $.unary_expression,
         $.cast_expression,
         $.binary_expression,
@@ -466,6 +467,16 @@ export default grammar({
 
     unwrap_expression: ($) =>
       prec(PREC.postfix, seq(field("value", $._expression), "!")),
+
+    // `?.` is a single token in the reference lexer, produced unconditionally
+    // whenever '.' follows '?'. Modelling it as one token here reproduces
+    // that faithfully, quirk included: `a ?.Some(1) : .None` mis-lexes
+    // upstream too, and needs the same space after `?` to parse as a ternary.
+    optional_chain_expression: ($) =>
+      prec(
+        PREC.postfix,
+        seq(field("value", $._expression), "?.", field("field", $.identifier)),
+      ),
 
     propagate_expression: ($) =>
       prec(PREC.ternary, seq(field("value", $._expression), "?")),
