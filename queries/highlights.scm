@@ -199,8 +199,21 @@
   "?."
 ] @punctuation.delimiter
 
+; '_' is its own token upstream (lexer.zup maps the text to TOKEN_UNDERSCORE),
+; never a name that can be read back, so every site that takes one gets the
+; wildcard colour rather than @variable: the match-all arm, a discarded
+; binding or loop variable, and an ignored variant payload.
 (match_arm
   "_" @character.special)
+
+(variable_declaration
+  name: "_" @character.special)
+
+(for_statement
+  item: "_" @character.special)
+
+(enum_literal
+  payload: "_" @character.special)
 
 ; --- Comments --------------------------------------------------------------
 

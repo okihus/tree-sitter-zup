@@ -359,3 +359,39 @@ fn f(c: i32) {
               (argument_list)))
           (match_arm
             (block)))))))
+
+==================
+'_' discards a binding or a loop variable
+==================
+
+fn f(items: []i32) {
+  const _ = compute();
+  let _ = 1;
+  for _ in 0..10 {}
+  for _ in items {}
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (slice_type
+          (primitive_type))))
+    (block
+      (variable_declaration
+        (call_expression
+          (identifier)
+          (argument_list)))
+      (variable_declaration
+        (number_literal))
+      (for_statement
+        (number_literal)
+        (number_literal)
+        (block))
+      (for_statement
+        (identifier)
+        (block)))))

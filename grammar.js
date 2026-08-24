@@ -209,7 +209,7 @@ export default grammar({
       seq(
         optional($.visibility_modifier),
         choice("let", "const"),
-        field("name", $.identifier),
+        field("name", choice($.identifier, "_")),
         optional(seq(":", field("type", $._type))),
         optional(seq("=", field("value", $._expression))),
         ";",
@@ -329,7 +329,7 @@ export default grammar({
     for_statement: ($) =>
       seq(
         "for",
-        field("item", $.identifier),
+        field("item", choice($.identifier, "_")),
         "in",
         field("iterable", $._expression),
         optional(seq("..", field("end", $._expression))),
@@ -575,7 +575,7 @@ export default grammar({
         seq(
           ".",
           field("name", $.identifier),
-          optional(seq("(", field("payload", $._expression), ")")),
+          optional(seq("(", field("payload", choice($._expression, "_")), ")")),
         ),
       ),
 

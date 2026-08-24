@@ -192,3 +192,36 @@ fn f(x: i32) {
                   (argument_list)))))
           (match_arm
             (block)))))))
+
+==================
+'_' ignores a variant payload
+==================
+
+fn f(k: K): i32 {
+  return match k {
+    .A(_) => 1,
+    _ => 0,
+  };
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (type_identifier)))
+    (primitive_type)
+    (block
+      (return_statement
+        (match_expression
+          (identifier)
+          (match_arm
+            (match_pattern
+              (enum_literal
+                (identifier)))
+            (number_literal))
+          (match_arm
+            (number_literal)))))))
