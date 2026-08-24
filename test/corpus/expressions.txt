@@ -710,6 +710,59 @@ fn f() {
           (escape_sequence))))))
 
 ==================
+multiline string literals
+==================
+
+const banner =
+\\/* generated */
+  \\ * do not edit
+;
+
+fn f() {
+  let s = \\one "quoted" \n verbatim
+  ;
+}
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (multiline_string_literal))
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (block
+      (variable_declaration
+        (identifier)
+        (multiline_string_literal)))))
+
+==================
+a blank line ends a multiline string
+==================
+
+fn f() {
+  let s =
+    \\first
+
+    \\second
+  ;
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list)
+    (block
+      (variable_declaration
+        (identifier)
+        (ERROR
+          (multiline_string_literal))
+        (multiline_string_literal)))))
+
+==================
 boolean and null literals
 ==================
 

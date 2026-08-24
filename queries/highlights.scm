@@ -120,6 +120,8 @@
 
 (string_literal) @string
 
+(multiline_string_literal) @string
+
 (escape_sequence) @string.escape
 
 (boolean_literal) @boolean
