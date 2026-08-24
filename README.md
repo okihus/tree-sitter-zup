@@ -15,12 +15,12 @@ errors, though, stay errors. Structure and operator precedence mirror the
 reference implementation's `src/parser.zup` (the compiler is self-hosted).
 
 Last validated against zup commit
-[`9567df5`](https://github.com/hent0/zup/commit/9567df5)
-(2026-08-14): all of `examples/` and `std/`, plus 628 of the 681 `--FILE--`
-bodies in `tests/`, parse with zero `ERROR` nodes. The 53 exclusions are
-tests asserting a parse error, `tests/lexer/` token-stream fixtures, and the
-known gaps listed in `test/upstream-skip.txt`. A weekly CI job re-checks
-against zup `HEAD`.
+[`61cf2c8`](https://github.com/hent0/zup/commit/61cf2c8)
+(2026-08-24): 55 of the 56 `*.zup` files in `examples/`, `std/` and `src/`
+(the self-hosted compiler), plus 633 of the 687 `--FILE--` bodies in `tests/`,
+parse with zero `ERROR` nodes. The exclusions are tests asserting a parse
+error, `tests/lexer/` token-stream fixtures, and the known gaps listed in
+`test/upstream-skip.txt`. A weekly CI job re-checks against zup `HEAD`.
 
 ## Neovim (nvf)
 

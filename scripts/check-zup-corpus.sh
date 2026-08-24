@@ -4,9 +4,15 @@
 # MISSING node. Usage: check-zup-corpus.sh [zup-checkout]  (default ~/Projects/zup)
 #
 # Three passes:
-#   1. examples/ and std/ *.zup       -> zup grammar
+#   1. examples/, std/ and src/ *.zup -> zup grammar
 #   2. tests/ *.zupt                  -> zupt grammar (section structure only)
 #   3. tests/ --FILE-- section bodies -> zup grammar
+#
+# Pass 1 includes src/, the self-hosted compiler itself, because it is both the
+# largest body of real zup upstream has (twice examples/ and std/ combined) and
+# the first place new syntax gets used — zig-style multiline strings landed
+# there, and only there, and so stayed invisible to a pass 1 that only read
+# examples/ and std/.
 #
 # Pass 3 exists because `tree-sitter parse` does not resolve injections: the zup
 # inside a --FILE-- body is completely invisible to pass 2. Without it the
@@ -26,9 +32,10 @@
 #     ("3.14 1e9 2.5e-3 1..10 42") rather than programs.
 #
 # Anything else that should not be parsed goes in test/upstream-skip.txt, one
-# path per line, with a reason. A new upstream parse-error test that matches
-# neither rule will fail loudly here for a human to triage — for a tripwire that
-# is the correct behaviour.
+# checkout-relative path per line, with a reason; the list covers passes 1 and
+# 3 alike. A new upstream parse-error test that matches neither rule will fail
+# loudly here for a human to triage — for a tripwire that is the correct
+# behaviour.
 
 set -euo pipefail
 
@@ -41,15 +48,34 @@ if [ ! -d "$zup_repo/tests" ]; then
   exit 1
 fi
 
-bodies="$(mktemp -d)"
-trap 'rm -rf "$bodies"' EXIT
+work="$(mktemp -d)"
+trap 'rm -rf "$work"' EXIT
 
-# --- pass 1: examples/ and std/ -------------------------------------------
+# Explicit skips, comments and blank lines stripped. awk rather than a
+# `grep -v '^$'` pipeline: grep exits 1 when it matches nothing, which under
+# pipefail would abort the run once the skip list is finally emptied.
+skips="$work/.skips"
+awk '{ sub(/#.*/, ""); sub(/[[:space:]]+$/, ""); if ($0 != "") print }' \
+  "$skip_file" | sort > "$skips"
 
-echo "==> examples/ and std/ (zup grammar)"
+# --- pass 1: examples/, std/ and src/ ---------------------------------------
+
+sources="$work/.sources"
+: > "$sources"
+src_total=0 src_skipped=0
+while IFS= read -r -d '' f; do
+  src_total=$((src_total + 1))
+  if grep -qxF "${f#"$zup_repo"/}" "$skips"; then
+    src_skipped=$((src_skipped + 1))
+    continue
+  fi
+  printf '%s\0' "$f" >> "$sources"
+done < <(find "$zup_repo/examples" "$zup_repo/std" "$zup_repo/src" \
+  -name '*.zup' -print0)
+
+echo "==> examples/, std/ and src/ (zup grammar): $((src_total - src_skipped)) of $src_total, $src_skipped skipped"
 cd "$repo_root"
-find "$zup_repo/examples" "$zup_repo/std" -name '*.zup' -print0 \
-  | xargs -0 tree-sitter parse --quiet --stat all
+xargs -0 tree-sitter parse --quiet --stat all < "$sources"
 
 # --- pass 2: .zupt section structure ---------------------------------------
 
@@ -60,20 +86,16 @@ find "$zup_repo/tests" -name '*.zupt' -print0 \
 
 # --- pass 3: --FILE-- bodies ------------------------------------------------
 
-# Explicit skips, comments and blank lines stripped. awk rather than a
-# `grep -v '^$'` pipeline: grep exits 1 when it matches nothing, which under
-# pipefail would abort the run once the skip list is finally emptied.
-skips="$bodies/.skips"
-awk '{ sub(/#.*/, ""); sub(/[[:space:]]+$/, ""); if ($0 != "") print }' \
-  "$skip_file" | sort > "$skips"
+bodies="$work/bodies"
+mkdir -p "$bodies"
 
 total=0 extracted=0 skipped=0
 while IFS= read -r -d '' f; do
   total=$((total + 1))
-  rel="${f#"$zup_repo"/tests/}"
+  rel="${f#"$zup_repo"/}"
 
   if grep -qF '(got TOKEN_' "$f" \
-    || [ "${rel#lexer/}" != "$rel" ] \
+    || [ "${rel#tests/lexer/}" != "$rel" ] \
     || grep -qxF "$rel" "$skips"; then
     skipped=$((skipped + 1))
     continue
@@ -82,7 +104,8 @@ while IFS= read -r -d '' f; do
   # Section headers own their whole line (see zupt/grammar.js); the --FILE--
   # body runs to the next header. The body is written out as *.zup so
   # tree-sitter picks the zup grammar by file type, not the zupt one.
-  flat="${rel//\//__}"
+  flat="${rel#tests/}"
+  flat="${flat//\//__}"
   awk '
     /^--[A-Z][A-Z0-9_]*--[ \t]*$/ { in_file = ($0 ~ /^--FILE--/); next }
     in_file { print }
